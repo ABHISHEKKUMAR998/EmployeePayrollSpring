@@ -1,5 +1,8 @@
 package com.example.EmployeePayrollapp.Controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,16 +15,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.EmployeePayrollapp.Model.EPAData;
+import com.example.EmployeePayrollapp.Service.IEPAService;
 import com.example.EmployeePayrollappDTO.EPADTO;
 import com.example.EmployeePayrollappDTO.ResponseDTO;
 
 @RestController
 @RequestMapping("/employeepayrollservice")
 public class EPAController {
+	
+	@Autowired
+	private IEPAService employeePayrollService;
+	
 	@RequestMapping(value = { "", "/", "get" })
 	public ResponseEntity<ResponseDTO> getEmployeePayrollData() {
-		EPAData empData = null;
-		empData = new EPAData(1, new EPADTO("Abhishek", 760000));
+		List<EPAData> empData = null;
+		empData = employeePayrollService.getEPAData();
 		ResponseDTO resDTO = new ResponseDTO("Get Call Success !!!", empData);
 		return new ResponseEntity<ResponseDTO>(resDTO, HttpStatus.OK);
 	}
@@ -29,15 +37,15 @@ public class EPAController {
 	@GetMapping("/get/{empId}")
 	public ResponseEntity<ResponseDTO> getEmployeePayrollData(@PathVariable("empId") int empId) {
 		EPAData empData = null;
-		empData = new EPAData(2, new EPADTO("Ankit", 400000));
+		empData = employeePayrollService.getEPADataById(empId);
 		ResponseDTO resDTO = new ResponseDTO("Get Call for id Successful:", empData);
 		return new ResponseEntity<ResponseDTO>(resDTO, HttpStatus.OK);
 	}
 
 	@PostMapping("/create")
-	public ResponseEntity<ResponseDTO> addEmployeePayrollData(@RequestBody EPADTO employeePayrollDTO) {
+	public ResponseEntity<ResponseDTO> createEmployeePayrollData(@RequestBody EPADTO employeePayrollDTO) {
 		EPAData empData = null;
-		empData = new EPAData(3, employeePayrollDTO);
+		empData = employeePayrollService.createEPAData(employeePayrollDTO);
 		ResponseDTO resDTO = new ResponseDTO("Created Employee Payroll Data Successfully:", empData);
 		return new ResponseEntity<ResponseDTO>(resDTO, HttpStatus.OK);
 	}
@@ -45,13 +53,14 @@ public class EPAController {
 	@PutMapping("/update")
 	public ResponseEntity<ResponseDTO> updateEmployeePayrollData(@RequestBody EPADTO employeePayrollDTO) {
 		EPAData empData = null;
-		empData = new EPAData(3, employeePayrollDTO);
+		empData = employeePayrollService.updateEPAData(employeePayrollDTO);
 		ResponseDTO resDTO = new ResponseDTO("Updated Employee Payroll Data Successfully: ", empData);
 		return new ResponseEntity<ResponseDTO>(resDTO, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/delete/{empId}")
 	public ResponseEntity<ResponseDTO> deleteEmployeePayrollData(@PathVariable("empId") int empId) {
+		employeePayrollService.deleteEPAData(empId);
 		ResponseDTO resDTO = new ResponseDTO("Deleted Successfully", "Deleted id: " + empId);
 		return new ResponseEntity<ResponseDTO>(resDTO, HttpStatus.OK);
 	}
